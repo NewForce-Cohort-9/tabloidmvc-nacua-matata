@@ -16,15 +16,17 @@ namespace TabloidMVC.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                       SELECT u.id, u.FirstName, u.LastName, u.DisplayName, u.Email,
-                              u.CreateDateTime, u.ImageLocation, u.UserTypeId,
-                              ut.[Name] AS UserTypeName
-                         FROM UserProfile u
-                              LEFT JOIN UserType ut ON u.UserTypeId = ut.id
-                        WHERE email = @email";
-                    cmd.Parameters.AddWithValue("@email", email);
+                SELECT u.Id, u.FirstName, u.LastName, u.DisplayName, u.Email,
+                       u.CreateDateTime, u.ImageLocation, u.UserTypeId,
+                       ut.[Name] AS UserTypeName
+                FROM UserProfile u
+                LEFT JOIN UserType ut ON u.UserTypeId = ut.Id
+                WHERE u.Email = @Email";
+
+                    cmd.Parameters.AddWithValue("@Email", email);
 
                     UserProfile userProfile = null;
+
                     var reader = cmd.ExecuteReader();
 
                     if (reader.Read())
@@ -43,16 +45,16 @@ namespace TabloidMVC.Repositories
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
                                 Name = reader.GetString(reader.GetOrdinal("UserTypeName"))
-                            },
+                            }
                         };
                     }
 
                     reader.Close();
-
                     return userProfile;
                 }
             }
         }
+
 
         public List<UserProfile> GetAllUserProfiles()
         {
