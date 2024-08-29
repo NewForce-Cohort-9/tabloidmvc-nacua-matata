@@ -69,8 +69,7 @@ namespace TabloidMVC.Repositories
                        ut.[Name] AS UserTypeName
                   FROM UserProfile u
                        LEFT JOIN UserType ut ON u.UserTypeId = ut.id
-                 WHERE u.UserTypeId = 1
-              ORDER BY u.DisplayName DESC;
+                 ORDER BY u.DisplayName ASC";
 
                     var reader = cmd.ExecuteReader();
                     var userProfiles = new List<UserProfile>();
