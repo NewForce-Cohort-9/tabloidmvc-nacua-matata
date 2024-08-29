@@ -1,0 +1,28 @@
+﻿@model List<TabloidMVC.Models.UserProfile>
+
+@{
+    ViewData["Title"] = "User Profiles";
+}
+
+<h2>User Profiles</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Display Name</th>
+            <th>User Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var profile in Model)
+        {
+            <tr>
+                <td>@profile.FullName</td>
+                <td>@profile.DisplayName</td>
+                <td>@profile.UserType.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
