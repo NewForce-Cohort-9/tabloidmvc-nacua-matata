@@ -70,7 +70,7 @@ namespace TabloidMVC.Repositories
                   FROM UserProfile u
                        LEFT JOIN UserType ut ON u.UserTypeId = ut.id
                  WHERE u.UserTypeId = 1
-              ORDER BY u.DisplayName";
+              ORDER BY u.DisplayName DESC;
 
                     var reader = cmd.ExecuteReader();
                     var userProfiles = new List<UserProfile>();
