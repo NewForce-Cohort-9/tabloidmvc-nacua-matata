@@ -1,14 +1,26 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TabloidMVC.Repositories;
+using TabloidMVC.Models.ViewModels;
+using TabloidMVC.Models;
 
 namespace TabloidMVC.Controllers
 {
     public class CommentController : Controller
     {
-        // GET: CommentController
-        public ActionResult Index()
+        private readonly ICommentRepository _commentRepo;
+
+        public CommentController(ICommentRepository commentRepository)
         {
-            return View();
+            _commentRepo = commentRepository;
+        }
+
+        // GET: CommentController
+        public ActionResult Index(int id)
+        {
+            var comments = _commentRepo.GetAllPostComments(id);
+
+            return View(comments);
         }
 
         // GET: CommentController/Details/5
