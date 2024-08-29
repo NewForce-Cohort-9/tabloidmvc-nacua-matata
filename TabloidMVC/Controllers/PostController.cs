@@ -68,10 +68,19 @@ namespace TabloidMVC.Controllers
             }
         }
 
+        public IActionResult MyPosts()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var posts = _postRepository.GetPostsByUser(userId);
+            return View(posts);
+        }
+
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.Parse(id);
         }
+
+
     }
 }
