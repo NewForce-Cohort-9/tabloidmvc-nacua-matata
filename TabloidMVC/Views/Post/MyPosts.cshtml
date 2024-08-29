@@ -23,8 +23,12 @@
                 <td>@post.UserProfile.DisplayName</td>
                 <td>@post.Category.Name</td>
                 <td>
-                    <a class="btn btn-primary" asp-controller="Post" asp-action="Edit" asp-route-id="@post.Id">Edit</a>
-                    <a class="btn btn-danger" asp-controller="Post" asp-action="Delete" asp-route-id="@post.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@post.Id" class="btn btn-outline-primary mx-1" title="Edit">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@post.Id" class="btn btn-outline-primary mx-1" title="Delete">
+                            <i class="fas fa-trash"></i>
+                    </a>
                     @if (post.PublishDateTime == null)
                     {
                         <a class="btn btn-success" asp-controller="Post" asp-action="Publish" asp-route-id="@post.Id">Publish</a>
