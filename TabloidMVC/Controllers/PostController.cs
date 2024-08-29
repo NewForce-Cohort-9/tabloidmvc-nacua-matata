@@ -68,11 +68,48 @@ namespace TabloidMVC.Controllers
             }
         }
 
+<<<<<<< HEAD
         public IActionResult MyPosts()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var posts = _postRepository.GetPostsByUser(userId);
             return View(posts);
+=======
+        public IActionResult Delete(int id)
+        {
+            // Get the current logged-in user's ID
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            // Retrieve the post to ensure it belongs to the current user
+            var post = _postRepository.GetUserPostById(id, userId);
+
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            return View(post);
+        }
+
+        // POST: Post/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            // Get the current logged-in user's ID
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            // Retrieve the post to ensure it belongs to the current user
+            var post = _postRepository.GetUserPostById(id, userId);
+
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            _postRepository.Delete(id);
+            return RedirectToAction(nameof(MyPosts));
+>>>>>>> a79ceb0211919a118713a6798a7f09595f0cd388
         }
 
         private int GetCurrentUserProfileId()

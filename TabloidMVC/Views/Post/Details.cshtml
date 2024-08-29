@@ -33,6 +33,13 @@
                 </div>
             </section>
         }
+        @if (Model.UserProfileId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
+        {
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+            </div>
+        }
         <section class="row post__content">
             <p class="col-sm-12 mt-5">@Html.DisplayFor(model => model.Content)</p>
         </section>
