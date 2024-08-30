@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TabloidMVC.Models;
 using TabloidMVC.Repositories;
 
 namespace TabloidMVC.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly IPostRepository _postRepository;
         private readonly ICategoryRepository _categoryRepository;
 
         public CategoryController(ICategoryRepository categoryRepository)
@@ -37,13 +37,15 @@ namespace TabloidMVC.Controllers
         // POST: CategoryController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Category category)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _categoryRepository.Add(category);
+
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
                 return View();
             }
