@@ -9,6 +9,7 @@ using System.Security.Policy;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
+
 namespace TabloidMVC.Controllers
 {
     public class CommentController : Controller
@@ -43,6 +44,7 @@ namespace TabloidMVC.Controllers
         // POST: CommentController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+
         public ActionResult Create(Comment comment)
         {
             try
@@ -60,6 +62,7 @@ namespace TabloidMVC.Controllers
             catch (Exception ex)
             {
                 return View(comment);
+
             }
         }
 
@@ -105,10 +108,12 @@ namespace TabloidMVC.Controllers
             }
         }
 
+
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.Parse(id);
         }
+
     }
 }

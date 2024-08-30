@@ -2,6 +2,7 @@
 using TabloidMVC.Models;
 using TabloidMVC.Utils;
 
+
 namespace TabloidMVC.Repositories
 {
     public class CommentRepository : BaseRepository, ICommentRepository
@@ -50,6 +51,7 @@ namespace TabloidMVC.Repositories
             }
         }
 
+
         public void Add(Comment comment)
         {
             using (var conn = Connection)
@@ -72,5 +74,6 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+
     }
 }

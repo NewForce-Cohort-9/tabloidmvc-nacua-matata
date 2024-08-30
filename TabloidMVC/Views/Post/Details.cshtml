@@ -1,7 +1,10 @@
 ﻿@model TabloidMVC.Models.Post
 
+@using System.Security.Claims
+
 @{
     ViewData["Title"] = $"Post - {Model.Title}";
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }
 
 <div class="container pt-5">
@@ -25,6 +28,14 @@
                 <a asp-action="Index" asp-controller="Comment" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="Comments">
                     <i class="fas fa-comment"></i>
                 </a>
+
+                @if (Model.UserProfileId.ToString() == userId)
+                {
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                }
+
             </div>
         </section>
         <hr />
@@ -41,3 +52,4 @@
         </section>
     </div>
 </div>
+
