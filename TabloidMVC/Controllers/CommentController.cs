@@ -44,12 +44,14 @@ namespace TabloidMVC.Controllers
             try
             {
                 comment.UserProfileId = GetCurrentUserProfileId();
-                comment.PostId = Url.Action()[Url.Action().Length - 1];
+                comment.PostId = (Url.Action()[Url.Action().Length - 1]) / 49;
                 comment.CreateDateTime = DateTime.Now;
 
                 _commentRepo.Add(comment);
 
-                return RedirectToAction($"{comment.PostId}");
+                string urlId = comment.PostId.ToString();
+
+                return RedirectToAction($"Index/{urlId}");
             }
             catch (Exception ex)
             {
