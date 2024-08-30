@@ -90,15 +90,12 @@ namespace TabloidMVC.Controllers
             return View(post);
         }
 
-        // POST: Post/Delete/5
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            // Get the current logged-in user's ID
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-            // Retrieve the post to ensure it belongs to the current user
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var post = _postRepository.GetUserPostById(id, userId);
 
             if (post == null)
@@ -109,6 +106,7 @@ namespace TabloidMVC.Controllers
             _postRepository.Delete(id);
             return RedirectToAction(nameof(MyPosts));
         }
+
 
         private int GetCurrentUserProfileId()
         {
