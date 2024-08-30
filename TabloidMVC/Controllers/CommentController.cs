@@ -116,24 +116,16 @@ namespace TabloidMVC.Controllers
             }
             catch (Exception ex)
             {
-                return View();
-            }
-        }
-
-
-        private int GetCurrentUserProfileId()
-        {
-            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.Parse(id);
                 return View(comment);
             }
         }
 
+
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.Parse(id);
+            }
         }
-
     }
 }
