@@ -65,7 +65,7 @@ namespace TabloidMVC.Repositories
             }
         }
 
-        public List<Post> GetPostsByUser(int userId)
+        public List<Post> GetUserPostsByUserProfileId(int userProfileId)
         {
             using (var conn = Connection)
             {
@@ -73,16 +73,17 @@ namespace TabloidMVC.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                SELECT p.Id, p.Title, p.Content, p.ImageLocation, p.CreateDateTime, 
-                       p.PublishDateTime, p.IsApproved, p.CategoryId, p.UserProfileId, 
-                       c.Name AS CategoryName, u.DisplayName as AuthorName
-                FROM Post p
-                LEFT JOIN Category c ON p.CategoryId = c.Id
-                LEFT JOIN UserProfile u ON p.UserProfileId = u.Id
-                WHERE p.UserProfileId = @userId
-                ORDER BY p.CreateDateTime DESC";
+            SELECT p.Id, p.Title, p.Content, p.ImageLocation, p.CreateDateTime, 
+                   p.PublishDateTime, p.IsApproved, p.CategoryId, p.UserProfileId, 
+                   c.Name AS CategoryName, u.DisplayName as AuthorName
+            FROM Post p
+            LEFT JOIN Category c ON p.CategoryId = c.Id
+            LEFT JOIN UserProfile u ON p.UserProfileId = u.Id
+            WHERE p.UserProfileId = @userProfileId
+            ORDER BY p.CreateDateTime DESC";
 
-                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.Parameters.AddWithValue("@userProfileId", userProfileId);
+
                     var reader = cmd.ExecuteReader();
                     var posts = new List<Post>();
                     while (reader.Read())
@@ -117,7 +118,6 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
-
 
         public Post GetPublishedPostById(int id)
         {
