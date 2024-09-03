@@ -1,0 +1,33 @@
+﻿@model TabloidMVC.Models.ViewModels.PostCreateViewModel
+
+@{
+    ViewData["Title"] = "Edit Post";
+}
+
+<h2>Edit Post</h2>
+
+<form asp-action="Edit" method="post">
+    <div class="form-group">
+        <label asp-for="Post.Title"></label>
+        <input asp-for="Post.Title" class="form-control" />
+        <span asp-validation-for="Post.Title" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Post.Content"></label>
+        <textarea asp-for="Post.Content" class="form-control"></textarea>
+        <span asp-validation-for="Post.Content" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Post.ImageLocation"></label>
+        <input asp-for="Post.ImageLocation" class="form-control" />
+        <span asp-validation-for="Post.ImageLocation" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Post.CategoryId"></label>
+        <select asp-for="Post.CategoryId" class="form-control" asp-items="@(new SelectList(Model.CategoryOptions, "Id", "Name"))"></select>
+        <span asp-validation-for="Post.CategoryId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Details" asp-route-id="@Model.Post.Id" class="btn btn-secondary">Cancel</a>
+</form>
+

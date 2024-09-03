@@ -6,16 +6,10 @@ namespace TabloidMVC.Repositories
     public interface IPostRepository
     {
         void Add(Post post);
-        void Delete(int id);
+        void Delete(int id); // Method to delete a post by its ID
         List<Post> GetAllPublishedPosts();
         Post GetPublishedPostById(int id);
-        Post GetUserPostById(int id, int userProfileId);
-<<<<<<< HEAD
-
-        void Delete(int id); // Method to delete a post by its ID
-        List<Post> GetPostsByUser(int userId); // Method to get all posts by a specific user
-=======
         List<Post> GetUserPostsByUserProfileId(int userProfileId);
->>>>>>> main
+        void Update(Post post);
     }
 }
