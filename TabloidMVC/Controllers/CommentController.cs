@@ -8,6 +8,7 @@ using System.Web;
 using System.Security.Policy;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using System.Security.Claims;
 
 
 namespace TabloidMVC.Controllers
@@ -69,51 +70,73 @@ namespace TabloidMVC.Controllers
         // GET: CommentController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Comment comment = _commentRepo.GetCommentById(id);
+            
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            return View(comment);
         }
 
         // POST: CommentController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Comment comment)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _commentRepo.EditComment(comment);
+
+                return RedirectToAction("Index", "Comment", new { id = comment.PostId });
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return NotFound();
             }
         }
 
         // GET: CommentController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            var userId = GetCurrentUserProfileId();
+
+            var comment = _commentRepo.GetUserCommentById(id, userId);
+
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            return View(comment);
         }
 
         // POST: CommentController/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult DeleteConfirmed(int id)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var userId = GetCurrentUserProfileId();
+
+                var comment = _commentRepo.GetUserCommentById(id, userId);
+
+                _commentRepo.Delete(comment.Id);
+
+                return RedirectToAction("Index", "Comment", new { id = comment.PostId });
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return NotFound();
             }
         }
-
 
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.Parse(id);
         }
-
     }
 }
