@@ -101,5 +101,42 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+
+        public UserProfile GetUserProfileById (int id)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT u.Id, u.FirstName, u.LastName, u.ImageLocation, u.DisplayName, u.Email, u.CreateDateTime, u.UserTypeId, ut.Id, ut.Name
+                                        FROM UserProfile AS u
+                                        LEFT JOIN UserType ut ON ut.Id = u.UserTypeId
+                                        WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    var reader = cmd.ExecuteReader();
+
+                    UserProfile userProfile = new UserProfile()
+                    {
+                        FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                        LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                        ImageLocation = reader.GetString(reader.GetOrdinal("ImageLocation")),
+                        DisplayName = reader.GetString(reader.GetOrdinal("DisplayName")),
+                        Email = reader.GetString(reader.GetOrdinal("Email")),
+                        CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
+                        UserType = new UserType
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
+                        }
+                    };
+
+                    reader.Close();
+
+                    return userProfile;
+                }
+            }
+        }
     }
 }
