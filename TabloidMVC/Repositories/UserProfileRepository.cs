@@ -109,28 +109,34 @@ namespace TabloidMVC.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT u.Id, u.FirstName, u.LastName, u.ImageLocation, u.DisplayName, u.Email, u.CreateDateTime, u.UserTypeId, ut.Id, ut.Name
+                    cmd.CommandText = @"SELECT u.Id, u.FirstName, u.LastName, u.ImageLocation, u.DisplayName, u.Email, u.CreateDateTime, u.UserTypeId, ut.Id AS UserTypeId, ut.Name
                                         FROM UserProfile AS u
                                         LEFT JOIN UserType ut ON ut.Id = u.UserTypeId
-                                        WHERE Id = @id";
+                                        WHERE u.Id = @id";
+                    
                     cmd.Parameters.AddWithValue("@id", id);
+
+                    UserProfile userProfile = null;
 
                     var reader = cmd.ExecuteReader();
 
-                    UserProfile userProfile = new UserProfile()
+                    if (reader.Read())
                     {
-                        FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                        LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                        ImageLocation = reader.GetString(reader.GetOrdinal("ImageLocation")),
-                        DisplayName = reader.GetString(reader.GetOrdinal("DisplayName")),
-                        Email = reader.GetString(reader.GetOrdinal("Email")),
-                        CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
-                        UserType = new UserType
+                        userProfile = new UserProfile()
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
-                            Name = reader.GetString(reader.GetOrdinal("Name"))
-                        }
-                    };
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            //ImageLocation = reader.GetString(reader.GetOrdinal("ImageLocation")),
+                            DisplayName = reader.GetString(reader.GetOrdinal("DisplayName")),
+                            Email = reader.GetString(reader.GetOrdinal("Email")),
+                            CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
+                            UserType = new UserType
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name"))
+                            }
+                        };
+                    }
 
                     reader.Close();
 
