@@ -12,7 +12,6 @@
             <th>Title</th>
             <th>Author</th>
             <th>Category</th>
-            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -22,6 +21,7 @@
                 <td>@post.Title</td>
                 <td>@post.UserProfile.DisplayName</td>
                 <td>@post.Category.Name</td>
+<<<<<<< HEAD
                 <td>
                     <a asp-action="Edit" asp-route-id="@post.Id" class="btn btn-outline-primary mx-1" title="Edit">
                         <i class="fas fa-pencil-alt"></i>
@@ -38,6 +38,8 @@
                         <a class="btn btn-warning" asp-controller="Post" asp-action="Unpublish" asp-route-id="@post.Id">Unpublish</a>
                     }
                 </td>
+=======
+>>>>>>> main
             </tr>
         }
     </tbody>

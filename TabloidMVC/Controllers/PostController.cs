@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic;
 using System.Security.Claims;
+using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
 
@@ -70,10 +71,55 @@ namespace TabloidMVC.Controllers
 
         public IActionResult MyPosts()
         {
+<<<<<<< HEAD
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var posts = _postRepository.GetPostsByUser(userId);
             return View(posts);
+=======
+            // Retrieve the current logged-in user's ID
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            // Fetch all posts authored by the current user
+            var posts = _postRepository.GetUserPostsByUserProfileId(userId);
+
+            // Pass the list of posts to the view
+            return View(posts);
         }
+        public IActionResult Delete(int id)
+        {
+            // Retrieve the current logged-in user's ID
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            // Retrieve the post by its ID and ensure it belongs to the current user
+            var post = _postRepository.GetUserPostById(id, userId);
+
+            if (post == null)
+            {
+                return NotFound(); // Return 404 if the post is not found or doesn't belong to the user
+            }
+            return View(post);
+        }
+
+
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var post = _postRepository.GetUserPostById(id, userId);
+
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            _postRepository.Delete(id);
+            return RedirectToAction(nameof(MyPosts));
+>>>>>>> main
+        }
+
+
 
         private int GetCurrentUserProfileId()
         {

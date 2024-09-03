@@ -2,8 +2,11 @@
 @using System.Security.Claims
 
 
+@using System.Security.Claims
+
 @{
     ViewData["Title"] = $"Post - {Model.Title}";
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }
 
 <div class="container pt-5">
@@ -24,6 +27,17 @@
                 <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="Delete">
                     <i class="fas fa-trash"></i>
                 </a>
+                <a asp-action="Index" asp-controller="Comment" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="Comments">
+                    <i class="fas fa-comment"></i>
+                </a>
+
+                @if (Model.UserProfileId.ToString() == userId)
+                {
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-1" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                }
+
             </div>
         </section>
         <hr />
@@ -35,15 +49,9 @@
                 </div>
             </section>
         }
-        @if (Model.UserProfileId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
-        {
-            <div>
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
-            </div>
-        }
         <section class="row post__content">
             <p class="col-sm-12 mt-5">@Html.DisplayFor(model => model.Content)</p>
         </section>
     </div>
 </div>
+
