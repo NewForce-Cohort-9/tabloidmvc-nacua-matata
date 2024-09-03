@@ -18,7 +18,9 @@
         @foreach (var profile in Model)
         {
             <tr>
-                <td>@profile.FullName</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@profile.Id">@profile.FullName</a>                    
+                </td>
                 <td>@profile.DisplayName</td>
                 <td>@profile.UserType.Name</td>
             </tr>
