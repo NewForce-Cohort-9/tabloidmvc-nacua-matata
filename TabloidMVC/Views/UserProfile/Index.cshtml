@@ -23,6 +23,9 @@
                 </td>
                 <td>@profile.DisplayName</td>
                 <td>@profile.UserType.Name</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@profile.Id">Deactivate</a>
+                </td>
             </tr>
         }
     </tbody>
