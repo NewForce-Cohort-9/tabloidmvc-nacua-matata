@@ -12,11 +12,13 @@ namespace TabloidMVC.Controllers
     {
         private readonly IPostRepository _postRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IUserProfileRepository _userProfileRepository;
 
-        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository)
+        public PostController(IPostRepository postRepository, ICategoryRepository categoryRepository, IUserProfileRepository userProfileRepository)
         {
             _postRepository = postRepository;
             _categoryRepository = categoryRepository;
+            _userProfileRepository = userProfileRepository;
         }
 
         public IActionResult Index()
@@ -31,8 +33,7 @@ namespace TabloidMVC.Controllers
             if (post == null)
             {
                 int userId = GetCurrentUserProfileId();
-                post = _postRepository.GetUserPostsByUserProfileId(userId)
-                                      .FirstOrDefault(p => p.Id == id);
+                post = _postRepository.GetUserPostById(id, userId);
                 if (post == null)
                 {
                     return NotFound();
@@ -54,7 +55,7 @@ namespace TabloidMVC.Controllers
             try
             {
                 vm.Post.CreateDateTime = DateTime.Now;
-                vm.Post.IsApproved = true;
+                vm.Post.IsApproved = true; 
                 vm.Post.UserProfileId = GetCurrentUserProfileId();
 
                 _postRepository.Add(vm.Post);
@@ -70,25 +71,48 @@ namespace TabloidMVC.Controllers
 
         public IActionResult MyPosts()
         {
-            // Retrieve the current logged-in user's ID
             var userId = GetCurrentUserProfileId();
-
-            // Fetch all posts authored by the current user
             var posts = _postRepository.GetUserPostsByUserProfileId(userId);
-
-            // Pass the list of posts to the view
             return View(posts);
+        }
+
+        public IActionResult Delete(int id)
+        {
+            var userId = GetCurrentUserProfileId();
+            var post = _postRepository.GetPostById(id);
+
+            if (post == null || (post.UserProfileId != userId && !IsAdmin()))
+            {
+                return Unauthorized(); // Unauthorized if the user is not the author or an Admin
+            }
+
+            return View(post);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var userId = GetCurrentUserProfileId();
+            var post = _postRepository.GetPostById(id);
+
+            if (post == null || (post.UserProfileId != userId && !IsAdmin()))
+            {
+                return Unauthorized(); // Unauthorized if the user is not the author or an Admin
+            }
+
+            _postRepository.Delete(id);
+            return RedirectToAction(nameof(MyPosts));
         }
 
         public IActionResult Edit(int id)
         {
             var userId = GetCurrentUserProfileId();
-            var post = _postRepository.GetUserPostsByUserProfileId(userId)
-                                       .FirstOrDefault(p => p.Id == id);
+            var post = _postRepository.GetPostById(id);
 
-            if (post == null)
+            if (post == null || (post.UserProfileId != userId && !IsAdmin()))
             {
-                return NotFound(); // Return 404 if the post is not found or doesn't belong to the user
+                return Unauthorized(); // Unauthorized if the user is not the author or an Admin
             }
 
             var vm = new PostCreateViewModel
@@ -100,22 +124,20 @@ namespace TabloidMVC.Controllers
             return View(vm);
         }
 
-        // POST: Post/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, PostCreateViewModel vm)
         {
+            var userId = GetCurrentUserProfileId();
+            var post = _postRepository.GetPostById(id);
+
+            if (post == null || (post.UserProfileId != userId && !IsAdmin()))
+            {
+                return Unauthorized(); // Unauthorized if the user is not the author or an Admin
+            }
+
             try
             {
-                var userId = GetCurrentUserProfileId();
-                var post = _postRepository.GetUserPostsByUserProfileId(userId)
-                                           .FirstOrDefault(p => p.Id == id);
-
-                if (post == null)
-                {
-                    return NotFound(); // Return 404 if the post is not found or doesn't belong to the user
-                }
-
                 post.Title = vm.Post.Title;
                 post.Content = vm.Post.Content;
                 post.ImageLocation = vm.Post.ImageLocation;
@@ -132,43 +154,17 @@ namespace TabloidMVC.Controllers
             }
         }
 
-        public IActionResult Delete(int id)
-        {
-            // Retrieve the current logged-in user's ID
-            var userId = GetCurrentUserProfileId();
-
-            // Retrieve the post by its ID and ensure it belongs to the current user
-            var post = _postRepository.GetUserPostsByUserProfileId(userId)
-                                      .FirstOrDefault(p => p.Id == id);
-
-            if (post == null)
-            {
-                return NotFound(); // Return 404 if the post is not found or doesn't belong to the user
-            }
-            return View(post);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            var userId = GetCurrentUserProfileId();
-            var post = _postRepository.GetUserPostsByUserProfileId(userId)
-                                      .FirstOrDefault(p => p.Id == id);
-
-            if (post == null)
-            {
-                return NotFound();
-            }
-
-            _postRepository.Delete(id);
-            return RedirectToAction(nameof(MyPosts));
-        }
-
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.Parse(id);
+        }
+
+        private bool IsAdmin()
+        {
+            var userId = GetCurrentUserProfileId();
+            var user = _userProfileRepository.GetById(userId);
+            return user != null && user.UserTypeId == 1; 
         }
     }
 }
