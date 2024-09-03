@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.VisualBasic;
 using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
@@ -33,7 +31,8 @@ namespace TabloidMVC.Controllers
             if (post == null)
             {
                 int userId = GetCurrentUserProfileId();
-                post = _postRepository.GetUserPostById(id, userId);
+                post = _postRepository.GetUserPostsByUserProfileId(userId)
+                                      .FirstOrDefault(p => p.Id == id);
                 if (post == null)
                 {
                     return NotFound();
@@ -54,7 +53,7 @@ namespace TabloidMVC.Controllers
         {
             try
             {
-                vm.Post.CreateDateTime = DateAndTime.Now;
+                vm.Post.CreateDateTime = DateTime.Now;
                 vm.Post.IsApproved = true;
                 vm.Post.UserProfileId = GetCurrentUserProfileId();
 
@@ -72,7 +71,7 @@ namespace TabloidMVC.Controllers
         public IActionResult MyPosts()
         {
             // Retrieve the current logged-in user's ID
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = GetCurrentUserProfileId();
 
             // Fetch all posts authored by the current user
             var posts = _postRepository.GetUserPostsByUserProfileId(userId);
@@ -80,13 +79,67 @@ namespace TabloidMVC.Controllers
             // Pass the list of posts to the view
             return View(posts);
         }
+
+        public IActionResult Edit(int id)
+        {
+            var userId = GetCurrentUserProfileId();
+            var post = _postRepository.GetUserPostsByUserProfileId(userId)
+                                       .FirstOrDefault(p => p.Id == id);
+
+            if (post == null)
+            {
+                return NotFound(); // Return 404 if the post is not found or doesn't belong to the user
+            }
+
+            var vm = new PostCreateViewModel
+            {
+                Post = post,
+                CategoryOptions = _categoryRepository.GetAll()
+            };
+
+            return View(vm);
+        }
+
+        // POST: Post/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, PostCreateViewModel vm)
+        {
+            try
+            {
+                var userId = GetCurrentUserProfileId();
+                var post = _postRepository.GetUserPostsByUserProfileId(userId)
+                                           .FirstOrDefault(p => p.Id == id);
+
+                if (post == null)
+                {
+                    return NotFound(); // Return 404 if the post is not found or doesn't belong to the user
+                }
+
+                post.Title = vm.Post.Title;
+                post.Content = vm.Post.Content;
+                post.ImageLocation = vm.Post.ImageLocation;
+                post.CategoryId = vm.Post.CategoryId;
+
+                _postRepository.Update(post);
+
+                return RedirectToAction("Details", new { id = post.Id });
+            }
+            catch
+            {
+                vm.CategoryOptions = _categoryRepository.GetAll();
+                return View(vm);
+            }
+        }
+
         public IActionResult Delete(int id)
         {
             // Retrieve the current logged-in user's ID
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = GetCurrentUserProfileId();
 
             // Retrieve the post by its ID and ensure it belongs to the current user
-            var post = _postRepository.GetUserPostById(id, userId);
+            var post = _postRepository.GetUserPostsByUserProfileId(userId)
+                                      .FirstOrDefault(p => p.Id == id);
 
             if (post == null)
             {
@@ -95,14 +148,13 @@ namespace TabloidMVC.Controllers
             return View(post);
         }
 
-
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var post = _postRepository.GetUserPostById(id, userId);
+            var userId = GetCurrentUserProfileId();
+            var post = _postRepository.GetUserPostsByUserProfileId(userId)
+                                      .FirstOrDefault(p => p.Id == id);
 
             if (post == null)
             {
@@ -113,14 +165,10 @@ namespace TabloidMVC.Controllers
             return RedirectToAction(nameof(MyPosts));
         }
 
-
-
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.Parse(id);
         }
-
-
     }
 }
