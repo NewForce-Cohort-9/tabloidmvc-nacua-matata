@@ -12,7 +12,6 @@
             <th>Title</th>
             <th>Author</th>
             <th>Category</th>
-            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -22,18 +21,6 @@
                 <td>@post.Title</td>
                 <td>@post.UserProfile.DisplayName</td>
                 <td>@post.Category.Name</td>
-                <td>
-                    <a class="btn btn-primary" asp-controller="Post" asp-action="Edit" asp-route-id="@post.Id">Edit</a>
-                    <a class="btn btn-danger" asp-controller="Post" asp-action="Delete" asp-route-id="@post.Id">Delete</a>
-                    @if (post.PublishDateTime == null)
-                    {
-                        <a class="btn btn-success" asp-controller="Post" asp-action="Publish" asp-route-id="@post.Id">Publish</a>
-                    }
-                    else
-                    {
-                        <a class="btn btn-warning" asp-controller="Post" asp-action="Unpublish" asp-route-id="@post.Id">Unpublish</a>
-                    }
-                </td>
             </tr>
         }
     </tbody>
