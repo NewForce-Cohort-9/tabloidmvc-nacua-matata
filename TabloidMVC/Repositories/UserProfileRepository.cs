@@ -17,7 +17,7 @@ namespace TabloidMVC.Repositories
                 {
                     cmd.CommandText = @"
                 SELECT u.Id, u.FirstName, u.LastName, u.DisplayName, u.Email,
-                       u.CreateDateTime, u.ImageLocation, u.UserTypeId,
+                       u.CreateDateTime, u.ImageLocation, u.UserTypeId, u.IsActive,
                        ut.[Name] AS UserTypeName
                 FROM UserProfile u
                 LEFT JOIN UserType ut ON u.UserTypeId = ut.Id
@@ -41,6 +41,7 @@ namespace TabloidMVC.Repositories
                             CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
                             ImageLocation = DbUtils.GetNullableString(reader, "ImageLocation"),
                             UserTypeId = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
+                            IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
                             UserType = new UserType()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
@@ -65,7 +66,7 @@ namespace TabloidMVC.Repositories
                 {
                     cmd.CommandText = @"
                 SELECT u.id, u.FirstName, u.LastName, u.DisplayName, u.Email,
-                       u.CreateDateTime, u.ImageLocation, u.UserTypeId,
+                       u.CreateDateTime, u.ImageLocation, u.UserTypeId, u.IsActive,
                        ut.[Name] AS UserTypeName
                   FROM UserProfile u
                        LEFT JOIN UserType ut ON u.UserTypeId = ut.id
@@ -86,6 +87,7 @@ namespace TabloidMVC.Repositories
                             CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
                             ImageLocation = DbUtils.GetNullableString(reader, "ImageLocation"),
                             UserTypeId = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
+                            IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
                             UserType = new UserType()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
@@ -94,7 +96,7 @@ namespace TabloidMVC.Repositories
                         };
                         userProfiles.Add(userProfile);
                     }
-
+                    
                     reader.Close();
 
                     return userProfiles;
@@ -109,7 +111,7 @@ namespace TabloidMVC.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT u.Id, u.FirstName, u.LastName, u.ImageLocation, u.DisplayName, u.Email, u.CreateDateTime, u.UserTypeId, ut.Id AS UserTypeId, ut.Name
+                    cmd.CommandText = @"SELECT u.Id, u.FirstName, u.LastName, u.ImageLocation, u.DisplayName, u.Email, u.CreateDateTime, u.UserTypeId, u.IsActive, ut.Id AS UserTypeId, ut.Name
                                         FROM UserProfile AS u
                                         LEFT JOIN UserType ut ON ut.Id = u.UserTypeId
                                         WHERE u.Id = @id";
@@ -126,10 +128,11 @@ namespace TabloidMVC.Repositories
                         {
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            //ImageLocation = reader.GetString(reader.GetOrdinal("ImageLocation")),
+                            ImageLocation = DbUtils.GetNullableString(reader, "ImageLocation"),
                             DisplayName = reader.GetString(reader.GetOrdinal("DisplayName")),
                             Email = reader.GetString(reader.GetOrdinal("Email")),
                             CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
+                            IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
                             UserType = new UserType
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("UserTypeId")),
@@ -141,6 +144,24 @@ namespace TabloidMVC.Repositories
                     reader.Close();
 
                     return userProfile;
+                }
+            }
+        }
+
+        public void SwapActivationStatus (UserProfile userProfile)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE UserProfile
+                                        SET IsActive = @isActive
+                                        WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@isActive", !userProfile.IsActive);
+                    cmd.Parameters.AddWithValue("@id", userProfile.Id);
+
+                    cmd.ExecuteNonQuery();
                 }
             }
         }

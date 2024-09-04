@@ -29,5 +29,18 @@ namespace TabloidMVC.Utils
         {
             return value ?? DBNull.Value;
         }
+
+        public static bool GetBool(SqlDataReader reader, string column)
+        {
+            var ordinal = reader.GetOrdinal(column);
+            if (reader.GetBoolean(ordinal) == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

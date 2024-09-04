@@ -19,7 +19,7 @@ namespace TabloidMVC.Models
         public string ImageLocation { get; set; }
         public int UserTypeId { get; set; }
         public UserType UserType { get; set; }
-
+        public Boolean IsActive { get; set; }
         [DisplayName("Full Name")]
         public string FullName
         {
